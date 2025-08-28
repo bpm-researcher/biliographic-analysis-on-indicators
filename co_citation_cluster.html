@@ -1,0 +1,155 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 600px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "rgb(150,150,150)", "font": {"color": "black"}, "id": "2013", "label": "2013", "shape": "dot", "size": 30, "title": "2013"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "2016", "label": "2016", "shape": "dot", "size": 20, "title": "2016"}, {"color": "rgb(50,50,50)", "font": {"color": "black"}, "id": "J vom Brocke (2021)", "label": "J vom Brocke (2021)", "shape": "dot", "size": 60, "title": "J vom Brocke (2021)"}, {"color": "rgb(83,83,83)", "font": {"color": "black"}, "id": "M Dumas (2018)", "label": "M Dumas (2018)", "shape": "dot", "size": 50, "title": "M Dumas (2018)"}, {"color": "rgb(150,150,150)", "font": {"color": "black"}, "id": "RS Kaplan (1992)", "label": "RS Kaplan (1992)", "shape": "dot", "size": 30, "title": "RS Kaplan (1992)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "RS Kaplan (1996)", "label": "RS Kaplan (1996)", "shape": "dot", "size": 20, "title": "RS Kaplan (1996)"}, {"color": "rgb(150,150,150)", "font": {"color": "black"}, "id": "J vom Brocke (2016)", "label": "J vom Brocke (2016)", "shape": "dot", "size": 30, "title": "J vom Brocke (2016)"}, {"color": "rgb(100,100,100)", "font": {"color": "black"}, "id": "10.1007/978-3-319-07881-6_31", "label": "10.1007/978-3-319-07881-6_31", "shape": "dot", "size": 45, "title": "10.1007/978-3-319-07881-6_31"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1016/j.is.2010.09.001", "label": "10.1016/j.is.2010.09.001", "shape": "dot", "size": 20, "title": "10.1016/j.is.2010.09.001"}, {"color": "rgb(66,66,66)", "font": {"color": "black"}, "id": "10.1108/01443579510083622", "label": "10.1108/01443579510083622", "shape": "dot", "size": 55, "title": "10.1108/01443579510083622"}, {"color": "rgb(0,0,0)", "font": {"color": "black"}, "id": "10.1504/IJBPM.2003.002097", "label": "10.1504/IJBPM.2003.002097", "shape": "dot", "size": 75, "title": "10.1504/IJBPM.2003.002097"}, {"color": "rgb(150,150,150)", "font": {"color": "black"}, "id": "0", "label": "0", "shape": "dot", "size": 30, "title": "0"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "2007", "label": "2007", "shape": "dot", "size": 25, "title": "2007"}, {"color": "rgb(83,83,83)", "font": {"color": "black"}, "id": "10.1108/01443579710167230", "label": "10.1108/01443579710167230", "shape": "dot", "size": 50, "title": "10.1108/01443579710167230"}, {"color": "rgb(83,83,83)", "font": {"color": "black"}, "id": "10.1007/978-3-319-59536-8_30", "label": "10.1007/978-3-319-59536-8_30", "shape": "dot", "size": 50, "title": "10.1007/978-3-319-59536-8_30"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1016/S0925-5273(96)00093-X", "label": "10.1016/S0925-5273(96)00093-X", "shape": "dot", "size": 20, "title": "10.1016/S0925-5273(96)00093-X"}, {"color": "rgb(83,83,83)", "font": {"color": "black"}, "id": "10.1108/01443579610125787", "label": "10.1108/01443579610125787", "shape": "dot", "size": 50, "title": "10.1108/01443579610125787"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "WMP van der Aalst (2016)", "label": "WMP van der Aalst (2016)", "shape": "dot", "size": 25, "title": "WMP van der Aalst (2016)"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "10.1016/j.compind.2003.10.007", "label": "10.1016/j.compind.2003.10.007", "shape": "dot", "size": 25, "title": "10.1016/j.compind.2003.10.007"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "2-Z", "label": "2-Z", "shape": "dot", "size": 20, "title": "2-Z"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "DJ Teece (1997)", "label": "DJ Teece (1997)", "shape": "dot", "size": 20, "title": "DJ Teece (1997)"}, {"color": "rgb(116,116,116)", "font": {"color": "black"}, "id": "10.1109/CBI.2017.46", "label": "10.1109/CBI.2017.46", "shape": "dot", "size": 40, "title": "10.1109/CBI.2017.46"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1109/ICDE.2005.73", "label": "10.1109/ICDE.2005.73", "shape": "dot", "size": 20, "title": "10.1109/ICDE.2005.73"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "10.1145/1452567.1452568", "label": "10.1145/1452567.1452568", "shape": "dot", "size": 25, "title": "10.1145/1452567.1452568"}, {"color": "rgb(150,150,150)", "font": {"color": "black"}, "id": "P Badakhshan (2022)", "label": "P Badakhshan (2022)", "shape": "dot", "size": 30, "title": "P Badakhshan (2022)"}, {"color": "rgb(150,150,150)", "font": {"color": "black"}, "id": "S Aguirre (2017)", "label": "S Aguirre (2017)", "shape": "dot", "size": 30, "title": "S Aguirre (2017)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "2011", "label": "2011", "shape": "dot", "size": 20, "title": "2011"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "M Rosemann (2015)", "label": "M Rosemann (2015)", "shape": "dot", "size": 20, "title": "M Rosemann (2015)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1007/978-3-642-45005-1_27", "label": "10.1007/978-3-642-45005-1_27", "shape": "dot", "size": 20, "title": "10.1007/978-3-642-45005-1_27"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "10.1108/02656710410542070", "label": "10.1108/02656710410542070", "shape": "dot", "size": 25, "title": "10.1108/02656710410542070"}, {"color": "rgb(100,100,100)", "font": {"color": "black"}, "id": "Measures that matter (bierbusse)", "label": "Measures that matter (bierbusse)", "shape": "dot", "size": 45, "title": "Measures that matter (bierbusse)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1016/j.compind.2005.03.001", "label": "10.1016/j.compind.2005.03.001", "shape": "dot", "size": 20, "title": "10.1016/j.compind.2005.03.001"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1108/17410400410569134", "label": "10.1108/17410400410569134", "shape": "dot", "size": 20, "title": "10.1108/17410400410569134"}, {"color": "rgb(133,133,133)", "font": {"color": "black"}, "id": "10.1108/01443570010330739", "label": "10.1108/01443570010330739", "shape": "dot", "size": 35, "title": "10.1108/01443570010330739"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "V Popova (2010)", "label": "V Popova (2010)", "shape": "dot", "size": 20, "title": "V Popova (2010)"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "AR Hevner (2004)", "label": "AR Hevner (2004)", "shape": "dot", "size": 25, "title": "AR Hevner (2004)"}, {"color": "rgb(150,150,150)", "font": {"color": "black"}, "id": "K Peffers (2007)", "label": "K Peffers (2007)", "shape": "dot", "size": 30, "title": "K Peffers (2007)"}, {"color": "rgb(150,150,150)", "font": {"color": "black"}, "id": "10.1007/978-3-540-88871-0_22", "label": "10.1007/978-3-540-88871-0_22", "shape": "dot", "size": 30, "title": "10.1007/978-3-540-88871-0_22"}, {"color": "rgb(133,133,133)", "font": {"color": "black"}, "id": "10.1108/01443570210450329", "label": "10.1108/01443570210450329", "shape": "dot", "size": 35, "title": "10.1108/01443570210450329"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "2006", "label": "2006", "shape": "dot", "size": 25, "title": "2006"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "A Augusto (2019)", "label": "A Augusto (2019)", "shape": "dot", "size": 25, "title": "A Augusto (2019)"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "10.1007/978-3-319-23063-4_21", "label": "10.1007/978-3-319-23063-4_21", "shape": "dot", "size": 25, "title": "10.1007/978-3-319-23063-4_21"}, {"color": "rgb(150,150,150)", "font": {"color": "black"}, "id": "10.1016/j.is.2009.12.001", "label": "10.1016/j.is.2009.12.001", "shape": "dot", "size": 30, "title": "10.1016/j.is.2009.12.001"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1006/mare.1999.0115", "label": "10.1006/mare.1999.0115", "shape": "dot", "size": 20, "title": "10.1006/mare.1999.0115"}, {"color": "rgb(150,150,150)", "font": {"color": "black"}, "id": "AE M\u00e1rquez-Chamorro (2017)", "label": "AE M\u00e1rquez-Chamorro (2017)", "shape": "dot", "size": 30, "title": "AE M\u00e1rquez-Chamorro (2017)"}, {"color": "rgb(133,133,133)", "font": {"color": "black"}, "id": "N Martin (2021)", "label": "N Martin (2021)", "shape": "dot", "size": 35, "title": "N Martin (2021)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "S Gregor (2013)", "label": "S Gregor (2013)", "shape": "dot", "size": 20, "title": "S Gregor (2013)"}, {"color": "rgb(133,133,133)", "font": {"color": "black"}, "id": "10.1016/S0361-3682(03)00033-3", "label": "10.1016/S0361-3682(03)00033-3", "shape": "dot", "size": 35, "title": "10.1016/S0361-3682(03)00033-3"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "T Schmiedel (2020)", "label": "T Schmiedel (2020)", "shape": "dot", "size": 20, "title": "T Schmiedel (2020)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "V Grover (2018)", "label": "V Grover (2018)", "shape": "dot", "size": 20, "title": "V Grover (2018)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1108/14637151011017976", "label": "10.1108/14637151011017976", "shape": "dot", "size": 20, "title": "10.1108/14637151011017976"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1108/14637151011017985", "label": "10.1108/14637151011017985", "shape": "dot", "size": 20, "title": "10.1108/14637151011017985"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "zigon (2011)", "label": "zigon (2011)", "shape": "dot", "size": 25, "title": "zigon (2011)"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "P Trkman (2010)", "label": "P Trkman (2010)", "shape": "dot", "size": 25, "title": "P Trkman (2010)"}, {"color": "rgb(133,133,133)", "font": {"color": "black"}, "id": "10.1057/palgrave.jors.2601279", "label": "10.1057/palgrave.jors.2601279", "shape": "dot", "size": 35, "title": "10.1057/palgrave.jors.2601279"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1007/11494744_25", "label": "10.1007/11494744_25", "shape": "dot", "size": 20, "title": "10.1007/11494744_25"}, {"color": "rgb(133,133,133)", "font": {"color": "black"}, "id": "10.1108/02635570610640988", "label": "10.1108/02635570610640988", "shape": "dot", "size": 35, "title": "10.1108/02635570610640988"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "T Grisold (2020)", "label": "T Grisold (2020)", "shape": "dot", "size": 25, "title": "T Grisold (2020)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1007/978-3-319-45348-4_23", "label": "10.1007/978-3-319-45348-4_23", "shape": "dot", "size": 20, "title": "10.1007/978-3-319-45348-4_23"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "neely (2002)", "label": "neely (2002)", "shape": "dot", "size": 25, "title": "neely (2002)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "A Augusto (2018)", "label": "A Augusto (2018)", "shape": "dot", "size": 20, "title": "A Augusto (2018)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "J vom Brocke (2014)", "label": "J vom Brocke (2014)", "shape": "dot", "size": 20, "title": "J vom Brocke (2014)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1109/ICNS.2009.80", "label": "10.1109/ICNS.2009.80", "shape": "dot", "size": 20, "title": "10.1109/ICNS.2009.80"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1109/ICWS.2006.113", "label": "10.1109/ICWS.2006.113", "shape": "dot", "size": 20, "title": "10.1109/ICWS.2006.113"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "J Mendling (2020)", "label": "J Mendling (2020)", "shape": "dot", "size": 25, "title": "J Mendling (2020)"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "10.1016/j.dss.2017.04.003", "label": "10.1016/j.dss.2017.04.003", "shape": "dot", "size": 25, "title": "10.1016/j.dss.2017.04.003"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "larcker (2004)", "label": "larcker (2004)", "shape": "dot", "size": 20, "title": "larcker (2004)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "S Zelt (2018)", "label": "S Zelt (2018)", "shape": "dot", "size": 20, "title": "S Zelt (2018)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "WMP van der Aalst (2003)", "label": "WMP van der Aalst (2003)", "shape": "dot", "size": 20, "title": "WMP van der Aalst (2003)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "WMP van der Aalst (2011)", "label": "WMP van der Aalst (2011)", "shape": "dot", "size": 20, "title": "WMP van der Aalst (2011)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1080/09537280512331333020", "label": "10.1080/09537280512331333020", "shape": "dot", "size": 20, "title": "10.1080/09537280512331333020"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "10.1109/ICPM.2019.00028", "label": "10.1109/ICPM.2019.00028", "shape": "dot", "size": 25, "title": "10.1109/ICPM.2019.00028"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "I Verenich (2019)", "label": "I Verenich (2019)", "shape": "dot", "size": 20, "title": "I Verenich (2019)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "D. Grigori (2004)", "label": "D. Grigori (2004)", "shape": "dot", "size": 20, "title": "D. Grigori (2004)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "W.M.P. van der Aalst (2003)", "label": "W.M.P. van der Aalst (2003)", "shape": "dot", "size": 20, "title": "W.M.P. van der Aalst (2003)"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1007/978-3-642-28108-2_19", "label": "10.1007/978-3-642-28108-2_19", "shape": "dot", "size": 20, "title": "10.1007/978-3-642-28108-2_19"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "10.1145/3301300", "label": "10.1145/3301300", "shape": "dot", "size": 25, "title": "10.1145/3301300"}, {"color": "rgb(166,166,166)", "font": {"color": "black"}, "id": "10.1109/TSC.2017.2772256", "label": "10.1109/TSC.2017.2772256", "shape": "dot", "size": 25, "title": "10.1109/TSC.2017.2772256"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1145/2939672.2939785", "label": "10.1145/2939672.2939785", "shape": "dot", "size": 20, "title": "10.1145/2939672.2939785"}, {"color": "rgb(183,183,183)", "font": {"color": "black"}, "id": "10.1007/978-3-319-65000-5_15", "label": "10.1007/978-3-319-65000-5_15", "shape": "dot", "size": 20, "title": "10.1007/978-3-319-65000-5_15"}]);
+                  edges = new vis.DataSet([{"from": "2013", "to": "2016", "value": 6}, {"from": "2013", "to": "2011", "value": 4}, {"from": "2013", "to": "2006", "value": 4}, {"from": "J vom Brocke (2021)", "to": "M Dumas (2018)", "value": 6}, {"from": "J vom Brocke (2021)", "to": "J vom Brocke (2016)", "value": 5}, {"from": "J vom Brocke (2021)", "to": "P Badakhshan (2022)", "value": 4}, {"from": "J vom Brocke (2021)", "to": "T Schmiedel (2020)", "value": 3}, {"from": "J vom Brocke (2021)", "to": "V Grover (2018)", "value": 3}, {"from": "J vom Brocke (2021)", "to": "J Mendling (2020)", "value": 3}, {"from": "J vom Brocke (2021)", "to": "S Zelt (2018)", "value": 3}, {"from": "J vom Brocke (2021)", "to": "S Aguirre (2017)", "value": 3}, {"from": "J vom Brocke (2021)", "to": "N Martin (2021)", "value": 3}, {"from": "M Dumas (2018)", "to": "WMP van der Aalst (2016)", "value": 5}, {"from": "M Dumas (2018)", "to": "S Aguirre (2017)", "value": 4}, {"from": "M Dumas (2018)", "to": "M Rosemann (2015)", "value": 4}, {"from": "M Dumas (2018)", "to": "J vom Brocke (2016)", "value": 4}, {"from": "M Dumas (2018)", "to": "A Augusto (2019)", "value": 4}, {"from": "M Dumas (2018)", "to": "P Trkman (2010)", "value": 3}, {"from": "RS Kaplan (1992)", "to": "RS Kaplan (1996)", "value": 5}, {"from": "RS Kaplan (1992)", "to": "V Popova (2010)", "value": 4}, {"from": "RS Kaplan (1992)", "to": "K Peffers (2007)", "value": 3}, {"from": "J vom Brocke (2016)", "to": "J Mendling (2020)", "value": 3}, {"from": "10.1007/978-3-319-07881-6_31", "to": "10.1016/j.is.2010.09.001", "value": 5}, {"from": "10.1007/978-3-319-07881-6_31", "to": "10.1007/978-3-319-59536-8_30", "value": 5}, {"from": "10.1007/978-3-319-07881-6_31", "to": "10.1109/CBI.2017.46", "value": 4}, {"from": "10.1007/978-3-319-07881-6_31", "to": "10.1007/978-3-540-88871-0_22", "value": 4}, {"from": "10.1007/978-3-319-07881-6_31", "to": "10.1007/978-3-319-23063-4_21", "value": 4}, {"from": "10.1007/978-3-319-07881-6_31", "to": "AE M\u00e1rquez-Chamorro (2017)", "value": 3}, {"from": "10.1108/01443579510083622", "to": "10.1504/IJBPM.2003.002097", "value": 5}, {"from": "10.1108/01443579510083622", "to": "10.1108/01443579710167230", "value": 5}, {"from": "10.1108/01443579510083622", "to": "10.1016/S0925-5273(96)00093-X", "value": 5}, {"from": "10.1108/01443579510083622", "to": "10.1108/01443570010330739", "value": 4}, {"from": "10.1108/01443579510083622", "to": "10.1108/01443570210450329", "value": 4}, {"from": "10.1108/01443579510083622", "to": "10.1108/01443579610125787", "value": 4}, {"from": "10.1108/01443579510083622", "to": "10.1016/S0361-3682(03)00033-3", "value": 3}, {"from": "10.1108/01443579510083622", "to": "10.1057/palgrave.jors.2601279", "value": 3}, {"from": "10.1504/IJBPM.2003.002097", "to": "10.1108/01443579610125787", "value": 4}, {"from": "10.1504/IJBPM.2003.002097", "to": "10.1108/01443579710167230", "value": 4}, {"from": "10.1504/IJBPM.2003.002097", "to": "10.1108/02656710410542070", "value": 4}, {"from": "10.1504/IJBPM.2003.002097", "to": "10.1108/01443570210450329", "value": 4}, {"from": "10.1504/IJBPM.2003.002097", "to": "Measures that matter (bierbusse)", "value": 4}, {"from": "10.1504/IJBPM.2003.002097", "to": "10.1108/01443570010330739", "value": 4}, {"from": "10.1504/IJBPM.2003.002097", "to": "0", "value": 3}, {"from": "10.1504/IJBPM.2003.002097", "to": "10.1016/j.is.2009.12.001", "value": 3}, {"from": "10.1504/IJBPM.2003.002097", "to": "10.1006/mare.1999.0115", "value": 3}, {"from": "10.1504/IJBPM.2003.002097", "to": "zigon (2011)", "value": 3}, {"from": "10.1504/IJBPM.2003.002097", "to": "10.1080/09537280512331333020", "value": 3}, {"from": "0", "to": "2007", "value": 5}, {"from": "0", "to": "10.1016/j.compind.2003.10.007", "value": 4}, {"from": "2007", "to": "2006", "value": 4}, {"from": "10.1108/01443579710167230", "to": "10.1108/01443579610125787", "value": 5}, {"from": "10.1108/01443579710167230", "to": "10.1108/01443570010330739", "value": 4}, {"from": "10.1108/01443579710167230", "to": "10.1016/S0361-3682(03)00033-3", "value": 3}, {"from": "10.1108/01443579710167230", "to": "10.1057/palgrave.jors.2601279", "value": 3}, {"from": "10.1108/01443579710167230", "to": "10.1108/01443570210450329", "value": 3}, {"from": "10.1007/978-3-319-59536-8_30", "to": "10.1109/CBI.2017.46", "value": 4}, {"from": "10.1007/978-3-319-59536-8_30", "to": "10.1007/978-3-642-45005-1_27", "value": 4}, {"from": "10.1007/978-3-319-59536-8_30", "to": "10.1007/11494744_25", "value": 3}, {"from": "10.1007/978-3-319-59536-8_30", "to": "10.1007/978-3-540-88871-0_22", "value": 3}, {"from": "10.1007/978-3-319-59536-8_30", "to": "A Augusto (2018)", "value": 3}, {"from": "10.1007/978-3-319-59536-8_30", "to": "10.1007/978-3-319-23063-4_21", "value": 3}, {"from": "10.1108/01443579610125787", "to": "10.1108/01443570010330739", "value": 4}, {"from": "10.1108/01443579610125787", "to": "10.1016/S0361-3682(03)00033-3", "value": 3}, {"from": "10.1108/01443579610125787", "to": "10.1057/palgrave.jors.2601279", "value": 3}, {"from": "10.1108/01443579610125787", "to": "10.1108/01443570210450329", "value": 3}, {"from": "WMP van der Aalst (2016)", "to": "A Augusto (2019)", "value": 3}, {"from": "10.1016/j.compind.2003.10.007", "to": "10.1145/1452567.1452568", "value": 4}, {"from": "2-Z", "to": "DJ Teece (1997)", "value": 4}, {"from": "10.1109/CBI.2017.46", "to": "AE M\u00e1rquez-Chamorro (2017)", "value": 3}, {"from": "10.1109/CBI.2017.46", "to": "10.1007/978-3-319-45348-4_23", "value": 3}, {"from": "10.1109/CBI.2017.46", "to": "10.1016/j.dss.2017.04.003", "value": 3}, {"from": "10.1109/ICDE.2005.73", "to": "10.1145/1452567.1452568", "value": 4}, {"from": "P Badakhshan (2022)", "to": "N Martin (2021)", "value": 3}, {"from": "P Badakhshan (2022)", "to": "T Grisold (2020)", "value": 3}, {"from": "S Aguirre (2017)", "to": "N Martin (2021)", "value": 3}, {"from": "10.1108/02656710410542070", "to": "Measures that matter (bierbusse)", "value": 4}, {"from": "Measures that matter (bierbusse)", "to": "neely (2002)", "value": 3}, {"from": "Measures that matter (bierbusse)", "to": "larcker (2004)", "value": 3}, {"from": "Measures that matter (bierbusse)", "to": "10.1016/j.is.2009.12.001", "value": 3}, {"from": "Measures that matter (bierbusse)", "to": "10.1108/02635570610640988", "value": 3}, {"from": "10.1016/j.compind.2005.03.001", "to": "10.1108/17410400410569134", "value": 4}, {"from": "AR Hevner (2004)", "to": "K Peffers (2007)", "value": 4}, {"from": "AR Hevner (2004)", "to": "10.1007/978-3-642-28108-2_19", "value": 3}, {"from": "K Peffers (2007)", "to": "S Gregor (2013)", "value": 3}, {"from": "10.1007/978-3-540-88871-0_22", "to": "AE M\u00e1rquez-Chamorro (2017)", "value": 3}, {"from": "10.1016/j.is.2009.12.001", "to": "10.1108/02635570610640988", "value": 3}, {"from": "N Martin (2021)", "to": "T Grisold (2020)", "value": 3}, {"from": "10.1016/S0361-3682(03)00033-3", "to": "10.1057/palgrave.jors.2601279", "value": 3}, {"from": "10.1108/14637151011017976", "to": "10.1108/14637151011017985", "value": 3}, {"from": "zigon (2011)", "to": "10.1108/02635570610640988", "value": 3}, {"from": "P Trkman (2010)", "to": "J vom Brocke (2014)", "value": 3}, {"from": "10.1108/02635570610640988", "to": "neely (2002)", "value": 3}, {"from": "10.1109/ICNS.2009.80", "to": "10.1109/ICWS.2006.113", "value": 3}, {"from": "10.1016/j.dss.2017.04.003", "to": "10.1145/3301300", "value": 3}, {"from": "WMP van der Aalst (2003)", "to": "WMP van der Aalst (2011)", "value": 3}, {"from": "10.1109/ICPM.2019.00028", "to": "I Verenich (2019)", "value": 3}, {"from": "10.1109/ICPM.2019.00028", "to": "10.1007/978-3-319-65000-5_15", "value": 3}, {"from": "D. Grigori (2004)", "to": "W.M.P. van der Aalst (2003)", "value": 3}, {"from": "10.1145/3301300", "to": "10.1109/TSC.2017.2772256", "value": 3}, {"from": "10.1109/TSC.2017.2772256", "to": "10.1145/2939672.2939785", "value": 3}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>

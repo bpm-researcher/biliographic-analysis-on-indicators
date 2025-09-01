@@ -65,16 +65,18 @@ def parse_article_references(article, references):
     references_line = ""
     for reference in references:
         reference_text = ""
-        if reference_fields[0] in reference:
-            reference_text = reference[reference_fields[0]] + "; "
-        elif reference_fields[1] in reference:
+        if reference_fields[1] in reference:
+            reference_text = reference[reference_fields[1]] + "; "
+        elif reference_fields[0] in reference:
             try:
-                doi = get_field_from_api('DOI', reference[reference_fields[1]])
-                if doi:
-                    reference_text = doi + "; "
+                title = get_field_from_api('title', reference[reference_fields[0]])
+                if title:
+                    reference_text = title[0] + "; "
             except Exception as e:
-                print(f"Could Not Find Doi For article: {e}")
-                reference_text = reference_fields[1] + "; "
+                print(f"Could Not Find Title For article: {e}")
+                reference_text = reference[reference_fields[0]] + "; "
+        elif "unstructured" in reference:
+            reference_text = reference['unstructured'] + "; "
         else:
             error_articles(article, reference)
             continue
@@ -143,7 +145,7 @@ def process_each_field(citation_field, df):
 
 def error_articles(article_name, reference):
     with open(
-        "/Users/i553815/lerning/graphics/biliographic-analysis-on-indicators/data_preparation/outputs/error2.txt",
+        "/Users/i553815/lerning/graphics/biliographic-analysis-on-indicators/data_preparation/outputs/error3.txt",
         "a",
         encoding="utf-8"
     ) as f:

@@ -1,6 +1,6 @@
 import os
 
-OUTPUT_DIR = "newProject/data_preparation/outputs"
+OUTPUT_DIR = "/Users/i553815/lerning/graphics/biliographic-analysis-on-indicators/data_preparation/outputs"
 OUTPUT_PREFIX = "output_"
 
 def get_next_output_filename(format):
@@ -13,7 +13,7 @@ def get_next_output_filename(format):
     for file in existing:
         try:
             num = (file.replace(OUTPUT_PREFIX, ""))
-            num = int(num.reeplace(format, ""))
+            num = int(num.replace(format, ""))
             existing_nums.append(num)
         except ValueError:
             continue

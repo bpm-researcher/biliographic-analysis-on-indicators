@@ -1,6 +1,6 @@
 ##Warning: This script takes a long time!
-##python3 /Users/i553815/lerning/bibliographic_analysis/newProject/data_preparation/operations/main.py fill_missing_field /Users/i553815/lerning/bibliographic_analysis/newProject/data_preparation/input_data/DataPaperpileExcelWorkbook.xlsx --citation_field "Times Cited"
-##python3 /Users/i553815/lerning/bibliographic_analysis/newProject/data_preparation/operations/main.py fill_missing_field /Users/i553815/lerning/bibliographic_analysis/newProject/data_preparation/input_data/output_1.xlsx --citation_field "Cited References"
+##python3  python3 /Users/i553815/lerning/graphics/biliographic-analysis-on-indicators/data_preparation/operations/main.py fill_missing_field /Users/i553815/lerning/graphics/biliographic-analysis-on-indicators/data_preparation/input_data/allMetadata.xlsx --citation_field "Article References"
+##python3  python3 /Users/i553815/lerning/graphics/biliographic-analysis-on-indicators/data_preparation/operations/main.py fill_missing_field /Users/i553815/lerning/graphics/biliographic-analysis-on-indicators/data_preparation/input_data/output_1.xlsx --citation_field "Article References"
 
 import argparse
 import argparse
@@ -16,7 +16,8 @@ CROSSREF_AVAILABLE_FIELDS = {
     'Title': 'title',
     'Abstract': 'abstract',
     'Language': 'language',
-    'Cited References': 'reference',
+    'Article References': 'reference',
+    'Author References': 'reference',
     'Times Cited': 'is-referenced-by-count',
     'Publication Year': 'created',
     'DOI': 'DOI'
@@ -48,7 +49,7 @@ def main():
 
     try:
         print(f"Running {args.function} with file {args.input_file}...")
-        breakpoint()
+        
         if(func == fill_missing_field):
             result = func(args.input_file, args.citation_field, output_file)
         else:

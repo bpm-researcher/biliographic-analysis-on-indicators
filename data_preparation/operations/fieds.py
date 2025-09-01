@@ -15,6 +15,7 @@ WOS_FIELDS = {
 }
 
 CROSSREF_AVAILABLE_FIELDS = {
+    'author': 'author',
     'Title': 'title',
     'Abstract': 'abstract',
     'Language': 'language',
@@ -25,4 +26,4 @@ CROSSREF_AVAILABLE_FIELDS = {
     'DOI': 'DOI'
 }
 
-REFERENCE_FIELDS = ["article-title", "author", "DOI"]
+REFERENCE_FIELDS = ["DOI", "article-title", "author"]

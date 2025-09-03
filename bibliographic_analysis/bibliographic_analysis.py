@@ -25,4 +25,3 @@ with tabs[3]:
     qualitative_analysis.show()
 
 
-##python3 -m streamlit run /Users/i553815/lerning/graphics/biliographic-analysis-on-indicators/bibliographic_analysis/bibliographic_analysis.py

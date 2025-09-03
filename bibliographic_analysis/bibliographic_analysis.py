@@ -23,3 +23,5 @@ with tabs[2]:
 
 with tabs[3]:
     qualitative_analysis.show()
+
+

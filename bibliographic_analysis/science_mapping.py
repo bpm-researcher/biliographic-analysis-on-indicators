@@ -9,32 +9,53 @@ from networkx.algorithms import community
 def show():
     st.title("Bibliometric Analysis - Co-Citation and Bibliographic Coupling")
 
-    # File upload
-    uploaded_file = st.file_uploader("Upload Excel file with columns 'Title' and 'Cited References'", type=["xlsx"])
+    uploaded_file = st.file_uploader("Upload Excel file with columns 'Title' and 'Article References'", type=["xlsx"])
 
     if uploaded_file:
         df = pd.read_excel(uploaded_file)
 
-        # Clean references
+        # --- Clean references for new format, prefer Title over DOI ---
         def clean_refs(refs):
+            """
+            Each reference line can contain: Title; DOI; unstructured text (all separated by ;)
+            Preference order:
+                1. Title
+                2. DOI if no title
+                3. raw text if neither
+            """
+            if pd.isna(refs):
+                return []
+
             refs_list = [r.strip() for r in refs.split(';') if r.strip()]
             clean = []
             for r in refs_list:
-                parts = r.split(',')
-                if len(parts) >= 2:
-                    ref_id = parts[0].strip() + " (" + parts[1].strip() + ")"
-                    clean.append(ref_id)
+                if any(c.isalpha() for c in r) and ' ' in r:
+                    clean.append(r)  # Title
+                elif r.lower().startswith("10.") or "doi.org" in r.lower():
+                    clean.append(r)  # DOI
                 else:
-                    clean.append(r)
+                    clean.append(r)  # Fallback text
             return clean
+
+        # --- Reference summary metrics ---
+        st.subheader("Reference Summary")
+        total_refs = sum(len(clean_refs(r)) for r in df['Article References'].dropna())
+        articles_with_refs = df['Article References'].dropna().shape[0]
+        articles_missing_refs = df['Article References'].isna().sum()
+
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Total References Found", total_refs)
+        col2.metric("Articles with References", articles_with_refs)
+        col3.metric("Articles Missing References", articles_missing_refs)
 
         # =====================
         # --- Co-Citation ---
         # =====================
         all_pairs = []
-        for refs in df['Cited References'].dropna():
+        for refs in df['Article References'].dropna():
             refs_list = clean_refs(refs)
-            for combo in itertools.combinations(sorted(set(refs_list)), 2):
+            refs_list = list(set(refs_list))  # remove duplicates
+            for combo in itertools.combinations(sorted(refs_list), 2):
                 all_pairs.append(combo)
 
         pairs_df = pd.DataFrame(all_pairs, columns=['Ref1', 'Ref2'])
@@ -52,27 +73,36 @@ def show():
         for _, row in top_pairs.iterrows():
             G.add_edge(row['Ref1'], row['Ref2'], weight=row['Count'])
 
-        # Detect clusters
         clusters = community.greedy_modularity_communities(G)
         cluster_dict = {i+1: list(c) for i, c in enumerate(clusters)}
 
-        # Cluster selection
         cluster_options = ["All"] + [f"Cluster {i}" for i in cluster_dict.keys()]
         selected_cluster = st.selectbox("Select Co-Citation Cluster", cluster_options)
 
-        def get_gray_color(degree, max_degree):
+        def get_orange_color(degree, max_degree):
             norm = degree / max_degree if max_degree > 0 else 0
-            gray_value = int(200 * (1 - norm))
-            return f"rgb({gray_value},{gray_value},{gray_value})"
+            r = 255
+            g = int(200 - 100 * norm)
+            b = int(100 * (1 - norm))
+            return f"rgb({r},{g},{b})"
 
-        # Pyvis graph rendering
         G_vis = Network(height="600px", width="100%", notebook=False, bgcolor="#ffffff", font_color="black")
         nodes_to_show = G.nodes() if selected_cluster == "All" else cluster_dict[int(selected_cluster.split()[1])]
-        max_degree = max([G.degree(node) for node in nodes_to_show])
+        max_degree = max([G.degree(node) for node in nodes_to_show]) if nodes_to_show else 1
 
-        for node in nodes_to_show:
-            degree = G.degree(node)
-            G_vis.add_node(node, label=node, title=node, size=15 + degree*5, color=get_gray_color(degree, max_degree))
+        legend_data = []
+        for cluster_id, cluster_nodes in cluster_dict.items():
+            if selected_cluster != "All" and cluster_id != int(selected_cluster.split()[1]):
+                continue
+
+            sorted_nodes = sorted(cluster_nodes, key=lambda n: G.degree(n), reverse=True)
+            for idx, node in enumerate(sorted_nodes, start=1):
+                node_number = f"{cluster_id}-{idx}"
+                legend_data.append({"Node": node_number, "Reference": node, "Cluster": cluster_id})
+
+                degree = G.degree(node)
+                G_vis.add_node(node, label=node_number, title=node,
+                               size=15 + degree*5, color=get_orange_color(degree, max_degree), group=cluster_id)
 
         for u, v, data in G.edges(data=True):
             if u in nodes_to_show and v in nodes_to_show:
@@ -84,15 +114,13 @@ def show():
         components.html(HtmlFile, height=600)
         st.download_button("Download Co-Citation Graph", HtmlFile, "co_citation_graph.html", "text/html")
 
-        # Cluster summary
+        st.subheader("Legend: Node → Reference")
+        st.dataframe(pd.DataFrame(legend_data))
+
         st.subheader("Co-Citation Cluster Summary")
-        cluster_summary = pd.DataFrame({
-            "Cluster": cluster_dict.keys(),
-            "Num_Nodes": [len(nodes) for nodes in cluster_dict.values()]
-        })
+        cluster_summary = pd.DataFrame({"Cluster": cluster_dict.keys(),
+                                        "Num_Nodes": [len(nodes) for nodes in cluster_dict.values()]})
         st.dataframe(cluster_summary)
-        csv_clusters = cluster_summary.to_csv(index=False).encode("utf-8")
-        st.download_button("Download Cluster Summary CSV", csv_clusters, "clusters_summary.csv", "text/csv")
 
         # =====================
         # --- Bibliographic Coupling ---
@@ -100,7 +128,7 @@ def show():
         st.subheader("Bibliographic Coupling with Clusters")
 
         pairs_bc = []
-        refs_list = df['Cited References'].dropna().tolist()
+        refs_list = df['Article References'].dropna().tolist()
         titles_list = df['Title'].dropna().tolist()
 
         for idx1, refs1 in enumerate(refs_list):
@@ -127,7 +155,6 @@ def show():
         for _, row in top_bc.iterrows():
             G_bc.add_edge(row['Article1'], row['Article2'], weight=row['Shared_Refs'])
 
-        # Detect clusters
         clusters_bc = community.greedy_modularity_communities(G_bc)
         cluster_dict_bc = {i+1: list(c) for i, c in enumerate(clusters_bc)}
 
@@ -136,11 +163,21 @@ def show():
 
         G_vis_bc = Network(height="600px", width="100%", notebook=False, bgcolor="#ffffff", font_color="black")
         nodes_to_show_bc = G_bc.nodes() if selected_cluster_bc == "All" else cluster_dict_bc[int(selected_cluster_bc.split()[1])]
-        max_degree_bc = max([G_bc.degree(node) for node in nodes_to_show_bc])
+        max_degree_bc = max([G_bc.degree(node) for node in nodes_to_show_bc]) if nodes_to_show_bc else 1
 
-        for node in nodes_to_show_bc:
-            degree = G_bc.degree(node)
-            G_vis_bc.add_node(node, label=node, title=node, size=15 + degree*5, color=get_gray_color(degree, max_degree_bc))
+        legend_data_bc = []
+        for cluster_id, cluster_nodes in cluster_dict_bc.items():
+            if selected_cluster_bc != "All" and cluster_id != int(selected_cluster_bc.split()[1]):
+                continue
+
+            sorted_nodes = sorted(cluster_nodes, key=lambda n: G_bc.degree(n), reverse=True)
+            for idx, node in enumerate(sorted_nodes, start=1):
+                node_number = f"{cluster_id}-{idx}"
+                legend_data_bc.append({"Node": node_number, "Article": node, "Cluster": cluster_id})
+
+                degree = G_bc.degree(node)
+                G_vis_bc.add_node(node, label=node_number, title=node,
+                                  size=15 + degree*5, color=get_orange_color(degree, max_degree_bc), group=cluster_id)
 
         for u, v, data in G_bc.edges(data=True):
             if u in nodes_to_show_bc and v in nodes_to_show_bc:
@@ -152,15 +189,13 @@ def show():
         components.html(HtmlFile_bc, height=600)
         st.download_button("Download Bibliographic Coupling Graph", HtmlFile_bc, "bibliographic_coupling_clusters.html", "text/html")
 
-        # BC cluster summary
+        st.subheader("Legend: Node → Article (BC)")
+        st.dataframe(pd.DataFrame(legend_data_bc))
+
         st.subheader("Bibliographic Coupling Cluster Summary")
-        cluster_summary_bc = pd.DataFrame({
-            "Cluster": cluster_dict_bc.keys(),
-            "Num_Nodes": [len(nodes) for nodes in cluster_dict_bc.values()]
-        })
+        cluster_summary_bc = pd.DataFrame({"Cluster": cluster_dict_bc.keys(),
+                                           "Num_Nodes": [len(nodes) for nodes in cluster_dict_bc.values()]})
         st.dataframe(cluster_summary_bc)
-        csv_clusters_bc = cluster_summary_bc.to_csv(index=False).encode("utf-8")
-        st.download_button("Download BC Cluster Summary CSV", csv_clusters_bc, "clusters_bc_summary.csv", "text/csv")
 
     else:
-        st.info("Please upload an Excel (.xlsx) file with 'Title' and 'Cited References' columns.")
+        st.info("Please upload an Excel (.xlsx) file with 'Title' and 'Article References' columns.")

@@ -19,7 +19,7 @@ def show():
 
         # --- Prepare reference pairs for graph ---
         all_pairs = []
-        for refs in df['Cited References'].dropna():
+        for refs in df['Article References'].dropna():
             refs_list = [r.strip() for r in refs.split(';') if r.strip()]
             cleaned_refs = []
             for r in refs_list:

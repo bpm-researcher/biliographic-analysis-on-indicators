@@ -1,6 +1,6 @@
 import os
 
-OUTPUT_DIR = "/Users/i553815/lerning/graphics/biliographic-analysis-on-indicators/data_preparation/outputs"
+OUTPUT_DIR = "biliographic_analysis_on_indicators/data_preparation/outputs"
 OUTPUT_PREFIX = "output_"
 
 def get_next_output_filename(format):

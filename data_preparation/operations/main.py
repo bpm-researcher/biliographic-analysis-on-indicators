@@ -1,6 +1,4 @@
 ##Warning: This script takes a long time!
-##python3  python3 /Users/i553815/lerning/graphics/biliographic-analysis-on-indicators/data_preparation/operations/main.py fill_missing_field /Users/i553815/lerning/graphics/biliographic-analysis-on-indicators/data_preparation/input_data/allMetadata.xlsx --citation_field "Article References"
-##python3  python3 /Users/i553815/lerning/graphics/biliographic-analysis-on-indicators/data_preparation/operations/main.py fill_missing_field /Users/i553815/lerning/graphics/biliographic-analysis-on-indicators/data_preparation/input_data/output_1.xlsx --citation_field "Article References"
 
 import argparse
 import argparse

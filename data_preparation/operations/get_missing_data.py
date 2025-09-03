@@ -19,7 +19,6 @@ def get_field_from_api(crossref_field, search_term):
         print(f"Request failed for search of: {search_term}\nError: {e}")
         return None        
 
-def parse_author_references(references, article):
     references_line = ""
 
     for reference in references:
@@ -58,7 +57,6 @@ def parse_author_references(references, article):
     references_line += reference_text
 
     return references_line
-
 
 
 def parse_article_references(article, references):
@@ -145,7 +143,7 @@ def process_each_field(citation_field, df):
 
 def error_articles(article_name, reference):
     with open(
-        "/Users/i553815/lerning/graphics/biliographic-analysis-on-indicators/data_preparation/outputs/error3.txt",
+        "biliographic_analysis_on_indicators/data_preparation/outputs/error.txt",
         "a",
         encoding="utf-8"
     ) as f:
